@@ -1,13 +1,27 @@
 "use client"
 
 import { motion } from "motion/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Book, ChevronLeft, ChevronRight, Heart, ArrowRight } from "lucide-react"
 import Image from "next/image"
 
 export default function PhotoBookScreen({ onNext }) {
     const [isBookOpen, setIsBookOpen] = useState(false)
     const [currentPage, setCurrentPage] = useState(0)
+
+    const [orientation, setOrientation] = useState("landscape")
+
+    useEffect(() => {
+    const img = new window.Image()
+    img.src = photos[currentPage].src
+    img.onload = () => {
+        if (img.naturalHeight > img.naturalWidth) {
+        setOrientation("portrait")
+        } else {
+        setOrientation("landscape")
+        }
+    }
+    }, [currentPage])
 
     const photos = [
         {
@@ -25,6 +39,10 @@ export default function PhotoBookScreen({ onNext }) {
         {
             id: 4,
             src: "/images/4.jpg",
+        },
+        {
+            id: 5,
+            src: "/images/5.jpg",
         },
     ]
 
@@ -172,16 +190,25 @@ export default function PhotoBookScreen({ onNext }) {
                                             }}
                                         >
                                             {/* Photo frame inner shadow */}
-                                            <div className="absolute inset-2 rounded-lg overflow-hidden">
+                                            <div className="absolute inset-0 bg-white flex items-center justify-center">
                                                 <Image
-                                                    src={photos[currentPage]?.src}
-                                                    alt={`Memory ${currentPage + 1}`}
-                                                    fill
-                                                    sizes="256px"
-                                                    quality={90}
-                                                    className="object-cover w-full h-full"
+                                                src={photos[currentPage]?.src}
+                                                alt={`Memory ${currentPage + 1}`}
+                                                width={220}
+                                                height={300}
+                                                className={`
+                                                    max-w-full max-h-full rounded-md
+                                                    ${orientation === "portrait" ? "object-contain" : "object-cover"}
+                                                `}
+                                                onLoadingComplete={(img) => {
+                                                    if (img.naturalHeight > img.naturalWidth) {
+                                                    setOrientation("portrait")
+                                                    } else {
+                                                    setOrientation("landscape")
+                                                    }
+                                                }}
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
+
                                             </div>
 
                                             {/* Decorative elements */}
